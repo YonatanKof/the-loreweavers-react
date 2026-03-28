@@ -59,7 +59,7 @@ function getCoverImage(page: PageObjectResponse): string | null {
 	const cover = page.cover;
 	if (!cover) return null;
 	if (cover.type === 'external') return cover.external.url;
-	if (cover.type === 'file') return cover.file.url; // ⚠️ expires — proxy later
+	if (cover.type === 'file') return cover.file.url;
 	return null;
 }
 
@@ -75,7 +75,7 @@ function mapPageToPost(page: PageObjectResponse): Post {
 		date: getDate(page, 'Date'),
 		displayName: getRichText(page, 'Display name'),
 		description: getRichText(page, 'Description'),
-		coverImage: getCoverImage(page),
+		coverImage: proxyImageUrl(getCoverImage(page)),
 	};
 }
 
@@ -112,4 +112,8 @@ export const getPosts = unstable_cache(
 export async function getPostBySlug(slug: string): Promise<Post | null> {
 	const all = await getPosts();
 	return all.find((p) => p.slug === slug) ?? null;
+}
+export function proxyImageUrl(url: string | null): string | null {
+	if (!url) return null;
+	return `/api/image?url=${encodeURIComponent(url)}`;
 }
