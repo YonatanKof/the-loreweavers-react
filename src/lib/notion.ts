@@ -56,6 +56,14 @@ function getDate(page: PageObjectResponse, prop: string): string {
 }
 
 function getCoverImage(page: PageObjectResponse): string | null {
+	// First try the Cover image property
+	const prop = page.properties['Cover image'];
+	if (prop?.type === 'files' && prop.files.length > 0) {
+		const file = prop.files[0];
+		if (file.type === 'external') return file.external.url;
+		if (file.type === 'file') return file.file.url;
+	}
+	// Fall back to the Notion page cover
 	const cover = page.cover;
 	if (!cover) return null;
 	if (cover.type === 'external') return cover.external.url;

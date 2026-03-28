@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
 	// Only proxy Notion-owned domains
 	const allowed = [
 		'prod-files-secure.s3.us-east-1.amazonaws.com',
+		'prod-files-secure.s3.us-west-2.amazonaws.com',
 		's3.us-east-1.amazonaws.com',
 		's3-us-west-2.amazonaws.com',
 		'secure.notion-static.com',
