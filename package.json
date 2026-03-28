@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@notionhq/client": "^5.15.0",
+    "@vercel/analytics": "^2.0.1",
     "marked": "^17.0.5",
     "next": "16.2.1",
     "notion-to-md": "^3.1.9",
