@@ -13,6 +13,7 @@ const DATA_SOURCE_ID = process.env.NOTION_DATA_SOURCE_ID!;
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface Post {
+	id: string;
 	slug: string;
 	name: string;
 	sessionNumber: number;
@@ -76,6 +77,7 @@ function getCoverImage(page: PageObjectResponse): string | null {
 function mapPageToPost(page: PageObjectResponse): Post {
 	const sessionNumber = getNumber(page, 'Session number');
 	return {
+		id: page.id,
 		slug: `session-num-${sessionNumber}`,
 		name: getTitle(page, 'Name'),
 		sessionNumber,
@@ -124,4 +126,21 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
 export function proxyImageUrl(url: string | null): string | null {
 	if (!url) return null;
 	return `/api/image?url=${encodeURIComponent(url)}`;
+}
+import { NotionToMarkdown } from 'notion-to-md';
+import { marked } from 'marked';
+
+const n2m = new NotionToMarkdown({ notionClient: notion });
+
+// Custom transformer for images — proxy Notion S3 URLs
+n2m.setCustomTransformer('image', async (block: any) => {
+	const url = block.image?.type === 'file' ? proxyImageUrl(block.image.file.url) : (block.image?.external?.url ?? '');
+	const caption = block.image?.caption?.map((t: any) => t.plain_text).join('') ?? '';
+	return `![${caption}](${url})`;
+});
+
+export async function getPageMarkdown(pageId: string): Promise<string> {
+	const mdBlocks = await n2m.pageToMarkdown(pageId);
+	const { parent: mdString } = n2m.toMarkdownString(mdBlocks);
+	return marked(mdString) as string;
 }
