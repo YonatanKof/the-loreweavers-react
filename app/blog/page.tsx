@@ -6,8 +6,8 @@ import styles from './blog.module.css';
 export const revalidate = 300; // Plan A fallback: revalidate every 5 min
 
 export const metadata = {
-	title: 'Session Summaries',
-	description: 'A log of all The Loreweavers D&D sessions.',
+	title: 'The Loreweavers Game Log',
+	description: 'The amazing Loreweavers and their epic quest to save/remake the world from/with darkness!',
 };
 
 export default async function BlogPage() {
@@ -15,7 +15,8 @@ export default async function BlogPage() {
 
 	return (
 		<main className={styles.main}>
-			<h1 className={styles.heading}>Session Summaries</h1>
+			<h1 className={styles.heading}>טווי האגדות</h1>
+			<h2 className={styles.subHeading}>יומן מסעות ומור״ק אגדית!</h2>
 			<ul className={styles.list}>
 				{posts.map((post) => (
 					<PostCard key={post.slug} post={post} />
@@ -35,12 +36,15 @@ function PostCard({ post }: { post: Post }) {
 					</div>
 				)}
 				<div className={styles.cardBody}>
-					<span className={styles.sessionNumber}>Session {post.sessionNumber}</span>
+					<div className={styles.cardMeta}>
+						<span className={styles.cardDate}>סשן {post.sessionNumber}</span>
+						<span className={styles.cardDate}> • </span>
+						<time className={styles.cardDate} dateTime={post.date}>
+							{formatDate(post.date)}
+						</time>
+					</div>
 					<h2 className={styles.cardTitle}>{post.displayName}</h2>
 					{post.description && <p className={styles.cardDescription}>{post.description}</p>}
-					<time className={styles.cardDate} dateTime={post.date}>
-						{formatDate(post.date)}
-					</time>
 				</div>
 			</Link>
 		</li>
@@ -49,7 +53,7 @@ function PostCard({ post }: { post: Post }) {
 
 function formatDate(dateStr: string): string {
 	if (!dateStr) return '';
-	return new Date(dateStr).toLocaleDateString('en-IL', {
+	return new Date(dateStr).toLocaleDateString('he-IL', {
 		year: 'numeric',
 		month: 'long',
 		day: 'numeric',

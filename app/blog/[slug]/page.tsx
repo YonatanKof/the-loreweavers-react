@@ -1,11 +1,10 @@
-import { getPosts, getPostBySlug } from '@/lib/notion';
+import { getPosts, getPostBySlug, getPageMarkdown } from '@/lib/notion';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import styles from '../blog.module.css';
 
 export const revalidate = 300;
 
-// Pre-generate all known slugs at build time
 export async function generateStaticParams() {
 	const posts = await getPosts();
 	return posts.map((post) => ({ slug: post.slug }));
@@ -24,8 +23,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
 	const { slug } = await params;
 	const post = await getPostBySlug(slug);
-
 	if (!post) notFound();
+
+	const contentHtml = await getPageMarkdown(post.id);
 
 	return (
 		<main className={styles.main}>
@@ -49,6 +49,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 				</header>
 
 				{post.description && <p className={styles.description}>{post.description}</p>}
+
+				{contentHtml && <div className={styles.content} dir="rtl" dangerouslySetInnerHTML={{ __html: contentHtml }} />}
 			</article>
 		</main>
 	);
