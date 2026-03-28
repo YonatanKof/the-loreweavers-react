@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang="en" className={cinzel.variable}>
+		<html lang="he" dir="rtl" className={cinzel.variable}>
 			<body>{children}</body>
 		</html>
 	);
