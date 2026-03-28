@@ -17,8 +17,8 @@
 	--text-muted: #5a5856;
 	--accent: #c9a96e;
 	--accent-hover: #dbbe88;
-	--font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-	--font-heading: var(--font-cinzel), Georgia, serif;
+	--font-sans: var(--font-rubik), system-ui;
+	--font-heading: var(--font-rubik-wet-paint), serif;
 	--radius: 8px;
 	--max-width: 860px;
 }
