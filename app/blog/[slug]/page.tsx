@@ -30,7 +30,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 	return (
 		<main className={styles.main}>
 			<nav className={styles.breadcrumb}>
-				<Link href="/blog">← All sessions</Link>
+				<Link href="/blog">
+					← All sessions
+				</Link>
 			</nav>
 
 			{post.coverImage && (
@@ -41,11 +43,14 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
 			<article className={styles.article}>
 				<header className={styles.articleHeader}>
-					<span className={styles.sessionNumber}>Session {post.sessionNumber}</span>
-					<h1 className={styles.heading}>{post.displayName}</h1>
-					<time className={styles.cardDate} dateTime={post.date}>
-						{formatDate(post.date)}
-					</time>
+					<h1 className={styles.postHeading}>{post.displayName}</h1>
+					<div className={styles.cardMeta}>
+						<span className={styles.cardDate}>סשן {post.sessionNumber}</span>
+						<span className={styles.cardDate}> • </span>
+						<time className={styles.cardDate} dateTime={post.date}>
+							{formatDate(post.date)}
+						</time>
+					</div>
 				</header>
 
 				{post.description && <p className={styles.description}>{post.description}</p>}
