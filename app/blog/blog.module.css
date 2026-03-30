@@ -1,25 +1,26 @@
 /* ── Shared layout ─────────────────────────────────────── */
 
 .main {
-	max-inline-size: var(--max-width);
+	max-inline-size: var(--grid-max-width);
 	margin-inline: auto;
-	padding-block-start: 4rem;
-	padding-block-end: 6rem;
+	padding-block: var(--space-m);
 }
 
 .heading {
 	font-family: var(--font-heading);
-	font-size: 4rem;
+	font-size: var(--step-5);
 	font-weight: 600;
 	color: var(--text-primary);
 	letter-spacing: 0.04em;
+	
 }
 .subHeading {
-	font-size: 1.75rem;
+	font-size: var(--step-2);
 	font-weight: 500;
 	color: var(--text-primary);
 	letter-spacing: 0.04em;
 	margin-block-end: 2.5rem;
+	letter-spacing: 0.04em;
 }
 
 /* ── Posts list ────────────────────────────────────────── */
@@ -28,32 +29,36 @@
 	list-style: none;
 	display: flex;
 	flex-direction: column;
-	gap: 1.5rem;
+	gap: var(--space-s);
 }
 
 .card {
 	border: 1px solid var(--border);
-	border-radius: var(--radius);
+	border-radius: var(--space-xs);
 	background: var(--bg-card);
 	overflow: hidden;
 	transition:
 		border-color 0.2s ease,
 		background 0.2s ease;
-}
-
-.card:hover {
-	border-color: var(--border-hover);
-	background: var(--bg-card-hover);
+	&:hover {
+		border-color: var(--border-hover);
+		background: var(--bg-card-hover);
+	}
 }
 
 .cardLink {
 	display: grid;
 	grid-template-columns: 1fr;
-	min-block-size: 200px;
 }
 
 .cardLink:has(.cardImage) {
-	grid-template-columns: 280px 1fr;
+	grid-template-columns: calc(var(--space-3xl) * 3 ) 1fr;
+	@media (width <= 720px) {
+		grid-template-columns: calc(var(--space-3xl) * 2 ) 1fr;
+	}
+	@media (width <= 480px) {
+		grid-template-columns: 1fr;
+	}
 }
 
 .cardImage {
@@ -73,27 +78,26 @@
 }
 
 .cardBody {
-	padding-block: 1.75rem;
-	padding-inline: 2rem;
+	padding-block: var(--space-m);
+	padding-inline: var(--space-m);
 	display: flex;
 	flex-direction: column;
-	gap: 0.5rem;
+	gap: var(--space-3xs);
 	width: 100%;
 }
 
 .cardTitle {
 	font-family: var(--font-heading);
-	font-size: 1.5rem;
+	font-size: var(--step-1);
+	margin-block-end: var(--space-3xs);
 	font-weight: 600;
 	color: var(--text-primary);
-	line-height: 1.3;
 	letter-spacing: 0.02em;
 }
 
 .cardDescription {
-	font-size: 0.9375rem;
 	color: var(--text-secondary);
-	line-height: 1.6;
+	font-size: var(--step-0);
 	display: -webkit-box;
 	-webkit-line-clamp: 3;
 	-webkit-box-orient: vertical;
@@ -101,6 +105,7 @@
 }
 
 .cardMeta {
+	font-size: var(--step--2);
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -108,7 +113,7 @@
 }
 
 .cardDate {
-	font-size: 0.75rem;
+	font-size: var(--step--2);
 	color: var(--accent);
 }
 
@@ -116,7 +121,7 @@
 
 .breadcrumb {
 	margin-block-end: 2rem;
-	font-size: 0.875rem;
+	font-size: var(--step--1);
 	color: var(--text-muted);
 	transition: color 0.15s ease;
 }
@@ -132,7 +137,7 @@
 .heroCover {
 	inline-size: 100%;
 	block-size: 380px;
-	border-radius: var(--radius);
+	border-radius: var(--space-xs);
 	overflow: hidden;
 	margin-block-end: 2.5rem;
 	border: 1px solid var(--border);
@@ -144,28 +149,31 @@
 	object-fit: cover;
 }
 
-.article {
-	max-inline-size: 680px;
-}
-
 .articleHeader {
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
-	margin-block-end: 2rem;
-	padding-block-end: 1.5rem;
+	margin-block-end: var(--space-m);
+	padding-block-end: var(--space-m);
 	border-block-end: 1px solid var(--border);
+}
+.postHeading {
+	font-family: var(--font-heading);
+	font-size: var(--step-4);
+	font-weight: 600;
+	color: var(--text-primary);
+	letter-spacing: 0.02em;
+	margin-block-end: var(--space-2xs);
 }
 
 .description {
-	font-size: 1.0625rem;
+	font-size: var(--step-1);
 	color: var(--text-secondary);
-	line-height: 1.75;
 }
 
 /* ── Responsive ────────────────────────────────────────── */
 
-@media (max-width: 640px) {
+/* @media (max-width: 640px) {
 	.cardLink {
 		grid-template-columns: 1fr;
 	}
@@ -181,14 +189,14 @@
 	.heroCover {
 		block-size: 220px;
 	}
-}
+} */
 
 /* ── Block content ─────────────────────────────────────── */
 
 .content {
 	margin-top: 2.5rem;
 	font-size: 1rem;
-	line-height: 1.8;
+	line-height: 1.6;
 	color: var(--text-primary);
 }
 
@@ -239,7 +247,7 @@
 
 .content :global(img) {
 	width: 100%;
-	border-radius: var(--radius);
+	border-radius: var(--space-xs);
 	border: 1px solid var(--border);
 	margin: 1.5rem 0;
 }
@@ -249,7 +257,7 @@
 	margin: 1.25rem 0;
 	padding: 0.75rem 1.25rem;
 	background: var(--bg-card);
-	border-radius: 0 var(--radius) var(--radius) 0;
+	border-radius: 0 var(--space-xs) var(--space-xs) 0;
 	color: var(--text-secondary);
 }
 
