@@ -8,19 +8,14 @@
 
 .heading {
 	font-family: var(--font-heading);
-	font-size: var(--step-5);
-	font-weight: 600;
-	color: var(--text-primary);
-	letter-spacing: 0.04em;
-	
+	font-size: var(--step-4);
+	letter-spacing: -0.02em;
 }
 .subHeading {
-	font-size: var(--step-2);
-	font-weight: 500;
-	color: var(--text-primary);
-	letter-spacing: 0.04em;
+	font-size: var(--step-1);
+	font-weight: 300;
 	margin-block-end: 2.5rem;
-	letter-spacing: 0.04em;
+	letter-spacing: -0.02em;
 }
 
 /* ── Posts list ────────────────────────────────────────── */
@@ -29,7 +24,7 @@
 	list-style: none;
 	display: flex;
 	flex-direction: column;
-	gap: var(--space-s);
+	gap: var(--space-m);
 }
 
 .card {
@@ -37,26 +32,35 @@
 	border-radius: var(--space-xs);
 	background: var(--bg-card);
 	overflow: hidden;
+	height: calc(var(--space-3xl) * 2);
 	transition:
-		border-color 0.2s ease,
-		background 0.2s ease;
+	border-color 0.2s ease,
+	background 0.2s ease;
 	&:hover {
 		border-color: var(--border-hover);
 		background: var(--bg-card-hover);
+	}
+	@media (width <= 800px) {
+		height: calc(var(--space-3xl) * 2.5);
+	}
+	@media (width <= 560px) {
+		height: 100%;
 	}
 }
 
 .cardLink {
 	display: grid;
 	grid-template-columns: 1fr;
+	height: inherit;
 }
 
 .cardLink:has(.cardImage) {
-	grid-template-columns: calc(var(--space-3xl) * 3 ) 1fr;
+	grid-template-columns: calc(var(--space-3xl) * 3) 1fr;
+	transition: grid-template-columns 0.4s ease;
 	@media (width <= 720px) {
-		grid-template-columns: calc(var(--space-3xl) * 2 ) 1fr;
+		grid-template-columns: calc(var(--space-3xl) * 2.5) 1fr;
 	}
-	@media (width <= 480px) {
+	@media (width <= 560px) {
 		grid-template-columns: 1fr;
 	}
 }
@@ -64,13 +68,12 @@
 .cardImage {
 	overflow: hidden;
 	background: var(--border);
-}
-
-.cardImage img {
-	inline-size: 100%;
-	block-size: 100%;
-	object-fit: cover;
-	transition: transform 0.3s ease;
+	& img {
+	   inline-size: 100%;
+	   block-size: 100%;
+	   object-fit: cover;
+	   transition: transform 0.3s ease;
+   }
 }
 
 .card:hover .cardImage img {
@@ -92,14 +95,13 @@
 	margin-block-end: var(--space-3xs);
 	font-weight: 600;
 	color: var(--text-primary);
-	letter-spacing: 0.02em;
+	letter-spacing: -0.01em;
 }
 
 .cardDescription {
-	color: var(--text-secondary);
-	font-size: var(--step-0);
+	font-size: var(--step--1);
 	display: -webkit-box;
-	-webkit-line-clamp: 3;
+	-webkit-line-clamp: 4;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
 }
@@ -148,7 +150,6 @@
 	block-size: 100%;
 	object-fit: cover;
 }
-
 .articleHeader {
 	display: flex;
 	flex-direction: column;
