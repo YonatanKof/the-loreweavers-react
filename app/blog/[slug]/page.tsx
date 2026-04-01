@@ -37,7 +37,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
 			{post.coverImage && (
 				<div className={styles.heroCover}>
-					<img src={post.coverImage} alt={post.displayName} />
+					<img src={Array.isArray(post.coverImage) ? post.coverImage[0] : post.coverImage} alt={post.displayName} />
 				</div>
 			)}
 
