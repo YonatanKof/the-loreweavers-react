@@ -16,8 +16,13 @@ export default async function BlogPage() {
 
 	return (
 		<main className={styles.main}>
-			<h1 className={styles.heading}>טווי האגדות</h1>
-			<h2 className={styles.subHeading}>יומן מסעות ומור״ק אגדית!</h2>
+			<header className={styles.mainHeader}>
+				<div>
+					<h1 className={styles.heading}>טווי האגדות</h1>
+					<h2 className={styles.subHeading}>יומן מסעות ומור״ק אגדית!</h2>
+				</div>
+				<img src="./the-loreweavers.webp" alt="The Loreweavers Logo" />
+			</header>
 			<ul className={styles.list}>
 				{posts.map((post) => (
 					<PostCard key={post.slug} post={post} />

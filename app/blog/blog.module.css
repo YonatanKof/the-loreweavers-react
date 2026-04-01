@@ -5,6 +5,35 @@
 	margin-inline: auto;
 	padding-block: var(--space-m);
 }
+@keyframes float3d {
+	0% {
+		transform: rotateY(0deg) rotateX(0deg);
+	}
+	20% {
+		transform: rotateY(-6deg) rotateX(3deg);
+	}
+	60% {
+		transform: rotateY(6deg) rotateX(-3deg);
+	}
+	100% {
+		transform: rotateY(0deg) rotateX(0deg);
+	}
+}
+
+.mainHeader {
+	margin-block-end: var(--space-m);
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	perspective: 600px;
+	& img {
+		inline-size: var(--space-3xl);
+		block-size: auto;
+		object-fit: contain;
+		animation: float3d 6s ease-out infinite;
+	}
+}
 
 .heading {
 	font-family: var(--font-heading);
@@ -14,7 +43,6 @@
 .subHeading {
 	font-size: var(--step-1);
 	font-weight: 300;
-	margin-block-end: 2.5rem;
 	letter-spacing: -0.02em;
 }
 
