@@ -2,6 +2,7 @@ import { getPosts } from '@/lib/notion';
 import type { Post } from '@/lib/notion';
 import Link from 'next/link';
 import styles from './blog.module.css';
+import { ImageGallery } from './ImageGallery';
 
 export const revalidate = 300; // Plan A fallback: revalidate every 5 min
 
@@ -30,11 +31,15 @@ function PostCard({ post }: { post: Post }) {
 	return (
 		<li className={styles.card}>
 			<Link href={`/blog/${post.slug}`} className={styles.cardLink}>
-				{post.coverImage && (
+				{Array.isArray(post.coverImage) ? (
+					<div className={styles.cardImage}>
+						<ImageGallery images={post.coverImage} alt={post.displayName} />
+					</div>
+				) : post.coverImage ? (
 					<div className={styles.cardImage}>
 						<img src={post.coverImage} alt={post.displayName} />
 					</div>
-				)}
+				) : null}
 				<div className={styles.cardBody}>
 					<div className={styles.cardMeta}>
 						<span className={styles.cardDate}>סשן {post.sessionNumber}</span>

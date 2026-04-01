@@ -34,8 +34,8 @@
 	overflow: hidden;
 	height: calc(var(--space-3xl) * 2);
 	transition:
-	border-color 0.2s ease,
-	background 0.2s ease;
+		border-color 0.2s ease,
+		background 0.2s ease;
 	&:hover {
 		border-color: var(--border-hover);
 		background: var(--bg-card-hover);
@@ -69,15 +69,96 @@
 	overflow: hidden;
 	background: var(--border);
 	& img {
-	   inline-size: 100%;
-	   block-size: 100%;
-	   object-fit: cover;
-	   transition: transform 0.3s ease;
-   }
+		inline-size: 100%;
+		block-size: 100%;
+		object-fit: cover;
+		transition: transform 0.3s ease;
+	}
 }
 
 .card:hover .cardImage img {
 	transform: scale(1.03);
+}
+
+/* ── Image gallery ─────────────────────────────────────── */
+
+.gallery {
+	position: relative;
+	inline-size: 100%;
+	block-size: 100%;
+	& img {
+		inline-size: 100%;
+		block-size: 100%;
+		object-fit: cover;
+		display: block;
+	}
+}
+
+.galleryArrow {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	background: rgba(0, 0, 0, 0.45);
+	color: #fff;
+	border: none;
+	border-radius: 50%;
+	inline-size: 2rem;
+	block-size: 2rem;
+	font-size: 1.4rem;
+	line-height: 1;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	transition:
+		opacity 0.2s ease,
+		background 0.2s ease;
+	z-index: 1;
+	padding: 0;
+}
+.galleryArrow:hover {
+	background: rgba(0, 0, 0, 0.7);
+}
+.galleryArrowPrev {
+	inset-inline-start: 0.4rem;
+}
+.galleryArrowNext {
+	inset-inline-end: 0.4rem;
+}
+
+.card:hover .galleryArrow {
+	opacity: 1;
+}
+
+.galleryDots {
+	position: absolute;
+	inset-block-end: var(--space-xs);
+	inset-inline: 0;
+	display: flex;
+	justify-content: center;
+	gap: calc(var(--space-3xs) * 1.5);
+}
+
+.galleryDot {
+	inline-size: calc(var(--space-3xs) * 1.5);
+	block-size: calc(var(--space-3xs) * 1.5);
+	border-radius: 50%;
+	border: none;
+	background: rgba(255, 255, 255, 0.5);
+	cursor: pointer;
+	padding: 0;
+	transition:
+		background 0.2s ease,
+		transform 0.2s ease;
+	&:hover {
+		transform: scale(1.25);
+	}
+}
+
+.galleryDotActive {
+	background: #fff;
+	transform: scale(1.25);
 }
 
 .cardBody {
