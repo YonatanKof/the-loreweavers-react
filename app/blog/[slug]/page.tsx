@@ -14,9 +14,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 	const { slug } = await params;
 	const post = await getPostBySlug(slug);
 	if (!post) return {};
+	const firstCover = Array.isArray(post.coverImage) ? post.coverImage[0] : post.coverImage;
 	return {
 		title: post.displayName,
 		description: post.description,
+		...(firstCover && {
+			openGraph: { images: [firstCover] },
+			twitter: { card: 'summary_large_image', images: [firstCover] },
+		}),
 	};
 }
 
@@ -37,7 +42,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
 			{post.coverImage && (
 				<div className={styles.heroCover}>
-					<img src={post.coverImage} alt={post.displayName} />
+					<img src={Array.isArray(post.coverImage) ? post.coverImage[0] : post.coverImage} alt={post.displayName} />
 				</div>
 			)}
 

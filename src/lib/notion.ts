@@ -21,7 +21,7 @@ export interface Post {
 	date: string;
 	displayName: string;
 	description: string;
-	coverImage: string | null;
+	coverImage: string | string[] | null;
 }
 
 // ─── Property helpers ────────────────────────────────────────────────────────
@@ -56,13 +56,19 @@ function getDate(page: PageObjectResponse, prop: string): string {
 	return '';
 }
 
-function getCoverImage(page: PageObjectResponse): string | null {
+function getCoverImage(page: PageObjectResponse): string | string[] | null {
 	// First try the Cover image property
 	const prop = page.properties['Cover image'];
 	if (prop?.type === 'files' && prop.files.length > 0) {
-		const file = prop.files[0];
-		if (file.type === 'external') return file.external.url;
-		if (file.type === 'file') return file.file.url;
+		const urls = prop.files
+			.map((file) => {
+				if (file.type === 'external') return file.external.url;
+				if (file.type === 'file') return file.file.url;
+				return null;
+			})
+			.filter((url): url is string => url !== null);
+		if (urls.length === 1) return urls[0];
+		if (urls.length > 1) return urls;
 	}
 	// Fall back to the Notion page cover
 	const cover = page.cover;
@@ -85,7 +91,7 @@ function mapPageToPost(page: PageObjectResponse): Post {
 		date: getDate(page, 'Date'),
 		displayName: getRichText(page, 'Display name'),
 		description: getRichText(page, 'Description'),
-		coverImage: proxyImageUrl(getCoverImage(page)),
+		coverImage: proxyCoverImage(getCoverImage(page)),
 	};
 }
 
@@ -123,6 +129,11 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
 	const all = await getPosts();
 	return all.find((p) => p.slug === slug) ?? null;
 }
+function proxyCoverImage(url: string | string[] | null): string | string[] | null {
+	if (Array.isArray(url)) return url.map((u) => proxyImageUrl(u)).filter((u): u is string => u !== null);
+	return proxyImageUrl(url);
+}
+
 export function proxyImageUrl(url: string | null): string | null {
 	if (!url) return null;
 	return `/api/image?url=${encodeURIComponent(url)}`;
