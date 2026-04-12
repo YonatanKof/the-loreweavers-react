@@ -7,8 +7,8 @@ import { ImageGallery } from './ImageGallery';
 export const revalidate = 300; // Plan A fallback: revalidate every 5 min
 
 export const metadata = {
-	title: 'The Loreweavers Game Log',
-	description: 'The amazing Loreweavers and their epic quest to save/remake the world from/with darkness!',
+	title: 'תקצירי המשחקים',
+	description: 'יומן מסעות ומור״ק אגדית!',
 };
 
 export default async function BlogPage() {

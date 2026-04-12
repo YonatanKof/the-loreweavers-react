@@ -17,8 +17,11 @@ const rubikWetPaint  = Rubik_Wet_Paint({
 });
 
 export const metadata: Metadata = {
-	title: 'The Loreweavers',
-	description: 'A chronicle of our D&D sessions.',
+	title: {
+		default: 'טווי האגדות',
+		template: '%s | טווי האגדות',
+	},
+	description: 'יומן מסעות ומור״ק אגדית!',
 	openGraph: {
 		images: ['/the-loreweavers.jpg'],
 	},
