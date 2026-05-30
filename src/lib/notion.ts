@@ -1,5 +1,7 @@
-import { Client, isFullPageOrDataSource } from '@notionhq/client';
+import { Client, isFullBlock, isFullPage, isFullPageOrDataSource } from '@notionhq/client';
 import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
+import { NotionToMarkdown } from 'notion-to-md';
+import { marked } from 'marked';
 import { unstable_cache } from 'next/cache';
 
 // ─── Client ──────────────────────────────────────────────────────────────────
@@ -9,6 +11,8 @@ const notion = new Client({
 });
 
 const DATA_SOURCE_ID = process.env.NOTION_DATA_SOURCE_ID!;
+
+const n2m = new NotionToMarkdown({ notionClient: notion });
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -22,6 +26,64 @@ export interface Post {
 	displayName: string;
 	description: string;
 	coverImage: string | string[] | null;
+}
+
+// ─── Stable image proxy URLs ─────────────────────────────────────────────────
+
+export function proxyCoverImageUrl(pageId: string, cover: number | 'page'): string {
+	if (cover === 'page') {
+		return `/api/image?pageId=${encodeURIComponent(pageId)}&cover=page`;
+	}
+	return `/api/image?pageId=${encodeURIComponent(pageId)}&cover=${cover}`;
+}
+
+export function proxyBlockImageUrl(blockId: string): string {
+	return `/api/image?blockId=${encodeURIComponent(blockId)}`;
+}
+
+function getCoverImageProxyUrls(page: PageObjectResponse): string | string[] | null {
+	const prop = page.properties['Cover image'];
+	if (prop?.type === 'files' && prop.files.length > 0) {
+		const urls = prop.files.map((_, index) => proxyCoverImageUrl(page.id, index));
+		if (urls.length === 1) return urls[0];
+		return urls;
+	}
+
+	if (page.cover) {
+		return proxyCoverImageUrl(page.id, 'page');
+	}
+
+	return null;
+}
+
+function fileUrlFromNotionFile(file: { type: string; external?: { url: string }; file?: { url: string } }): string | null {
+	if (file.type === 'external') return file.external?.url ?? null;
+	if (file.type === 'file') return file.file?.url ?? null;
+	return null;
+}
+
+export async function resolveCoverImageUrl(pageId: string, cover: string): Promise<string | null> {
+	const page = await notion.pages.retrieve({ page_id: pageId });
+	if (!isFullPage(page)) return null;
+
+	if (cover === 'page') {
+		if (!page.cover) return null;
+		return fileUrlFromNotionFile(page.cover);
+	}
+
+	const index = Number.parseInt(cover, 10);
+	if (Number.isNaN(index)) return null;
+
+	const prop = page.properties['Cover image'];
+	if (prop?.type !== 'files' || !prop.files[index]) return null;
+
+	return fileUrlFromNotionFile(prop.files[index]);
+}
+
+export async function resolveBlockImageUrl(blockId: string): Promise<string | null> {
+	const block = await notion.blocks.retrieve({ block_id: blockId });
+	if (!isFullBlock(block) || block.type !== 'image') return null;
+	return fileUrlFromNotionFile(block.image);
 }
 
 // ─── Property helpers ────────────────────────────────────────────────────────
@@ -56,28 +118,6 @@ function getDate(page: PageObjectResponse, prop: string): string {
 	return '';
 }
 
-function getCoverImage(page: PageObjectResponse): string | string[] | null {
-	// First try the Cover image property
-	const prop = page.properties['Cover image'];
-	if (prop?.type === 'files' && prop.files.length > 0) {
-		const urls = prop.files
-			.map((file) => {
-				if (file.type === 'external') return file.external.url;
-				if (file.type === 'file') return file.file.url;
-				return null;
-			})
-			.filter((url): url is string => url !== null);
-		if (urls.length === 1) return urls[0];
-		if (urls.length > 1) return urls;
-	}
-	// Fall back to the Notion page cover
-	const cover = page.cover;
-	if (!cover) return null;
-	if (cover.type === 'external') return cover.external.url;
-	if (cover.type === 'file') return cover.file.url;
-	return null;
-}
-
 // ─── Mapper ──────────────────────────────────────────────────────────────────
 
 function mapPageToPost(page: PageObjectResponse): Post {
@@ -91,13 +131,12 @@ function mapPageToPost(page: PageObjectResponse): Post {
 		date: getDate(page, 'Date'),
 		displayName: getRichText(page, 'Display name'),
 		description: getRichText(page, 'Description'),
-		coverImage: proxyCoverImage(getCoverImage(page)),
+		coverImage: getCoverImageProxyUrls(page),
 	};
 }
 
 // ─── Queries ─────────────────────────────────────────────────────────────────
 
-// Replace the existing getPosts export with this:
 export const getPosts = unstable_cache(
 	async (): Promise<Post[]> => {
 		const response = await notion.dataSources.query({
@@ -119,34 +158,22 @@ export const getPosts = unstable_cache(
 
 		return response.results.filter(isFullPageOrDataSource).map((page) => mapPageToPost(page as PageObjectResponse));
 	},
-	['notion-posts'], // cache key
+	['notion-posts'],
 	{
-		tags: ['notion-posts'], // invalidation tag — matches revalidateTag() call
-		revalidate: 300, // Plan A fallback: 5 min
+		tags: ['notion-posts'],
+		revalidate: 300,
 	},
 );
+
 export async function getPostBySlug(slug: string): Promise<Post | null> {
 	const all = await getPosts();
 	return all.find((p) => p.slug === slug) ?? null;
 }
-function proxyCoverImage(url: string | string[] | null): string | string[] | null {
-	if (Array.isArray(url)) return url.map((u) => proxyImageUrl(u)).filter((u): u is string => u !== null);
-	return proxyImageUrl(url);
-}
 
-export function proxyImageUrl(url: string | null): string | null {
-	if (!url) return null;
-	return `/api/image?url=${encodeURIComponent(url)}`;
-}
-import { NotionToMarkdown } from 'notion-to-md';
-import { marked } from 'marked';
-
-const n2m = new NotionToMarkdown({ notionClient: notion });
-
-// Custom transformer for images — proxy Notion S3 URLs
-n2m.setCustomTransformer('image', async (block: any) => {
-	const url = block.image?.type === 'file' ? proxyImageUrl(block.image.file.url) : (block.image?.external?.url ?? '');
-	const caption = block.image?.caption?.map((t: any) => t.plain_text).join('') ?? '';
+// Custom transformer for images — stable proxy URLs keyed by block ID
+n2m.setCustomTransformer('image', async (block: { id: string; image?: { caption?: { plain_text: string }[] } }) => {
+	const url = proxyBlockImageUrl(block.id);
+	const caption = block.image?.caption?.map((t) => t.plain_text).join('') ?? '';
 	return `![${caption}](${url})`;
 });
 
