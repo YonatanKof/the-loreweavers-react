@@ -1,4 +1,4 @@
-import { revalidateTag } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -8,7 +8,8 @@ export async function POST(request: NextRequest) {
 		return NextResponse.json({ message: 'Invalid secret' }, { status: 401 });
 	}
 
-	revalidateTag("notion-posts", { expire: 0 });
+	revalidateTag('notion-posts', { expire: 0 });
+	revalidatePath('/blog', 'layout');
 
 	return NextResponse.json({
 		revalidated: true,

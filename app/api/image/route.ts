@@ -1,46 +1,63 @@
+import { resolveBlockImageUrl, resolveCoverImageUrl } from '@/lib/notion';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
-	const url = request.nextUrl.searchParams.get('url');
+const NOTION_HOSTS = [
+	'prod-files-secure.s3.us-east-1.amazonaws.com',
+	'prod-files-secure.s3.us-west-2.amazonaws.com',
+	's3.us-east-1.amazonaws.com',
+	's3-us-west-2.amazonaws.com',
+	'secure.notion-static.com',
+	'www.notion.so',
+	'notion.so',
+];
 
-	if (!url) {
-		return new NextResponse('Missing url parameter', { status: 400 });
-	}
-
-	// Only proxy Notion-owned domains
-	const allowed = [
-		'prod-files-secure.s3.us-east-1.amazonaws.com',
-		'prod-files-secure.s3.us-west-2.amazonaws.com',
-		's3.us-east-1.amazonaws.com',
-		's3-us-west-2.amazonaws.com',
-		'secure.notion-static.com',
-		'www.notion.so',
-		'notion.so',
-	];
-
-	let hostname: string;
+function isAllowedImageUrl(url: string): boolean {
 	try {
-		hostname = new URL(url).hostname;
+		const parsed = new URL(url);
+		if (parsed.protocol !== 'https:') return false;
+		if (NOTION_HOSTS.some((domain) => parsed.hostname.endsWith(domain))) return true;
+		// External URLs linked from Notion blocks or file properties
+		return true;
 	} catch {
-		return new NextResponse('Invalid url', { status: 400 });
+		return false;
+	}
+}
+
+export async function GET(request: NextRequest) {
+	const pageId = request.nextUrl.searchParams.get('pageId');
+	const cover = request.nextUrl.searchParams.get('cover');
+	const blockId = request.nextUrl.searchParams.get('blockId');
+
+	let sourceUrl: string | null = null;
+
+	if (blockId) {
+		sourceUrl = await resolveBlockImageUrl(blockId);
+	} else if (pageId && cover !== null) {
+		sourceUrl = await resolveCoverImageUrl(pageId, cover);
+	} else {
+		return new NextResponse('Missing pageId/cover or blockId parameter', { status: 400 });
 	}
 
-	if (!allowed.some((domain) => hostname.endsWith(domain))) {
-		return new NextResponse('Domain not allowed', { status: 403 });
+	if (!sourceUrl) {
+		return new NextResponse('Image not found', { status: 404, headers: { 'Cache-Control': 'no-store' } });
+	}
+
+	if (!isAllowedImageUrl(sourceUrl)) {
+		return new NextResponse('Domain not allowed', { status: 403, headers: { 'Cache-Control': 'no-store' } });
 	}
 
 	try {
-		const response = await fetch(url, {
+		const response = await fetch(sourceUrl, {
 			headers: {
-				// Pass through a browser-like UA to avoid S3 blocking
 				'User-Agent': 'Mozilla/5.0',
 			},
-			next: { revalidate: 3600 }, // cache the proxied image for 1 hour
+			next: { revalidate: 86400 },
 		});
 
 		if (!response.ok) {
 			return new NextResponse('Failed to fetch image', {
 				status: response.status,
+				headers: { 'Cache-Control': 'no-store' },
 			});
 		}
 
@@ -51,11 +68,10 @@ export async function GET(request: NextRequest) {
 			status: 200,
 			headers: {
 				'Content-Type': contentType,
-				// Browser caches the image for 1 hour, CDN for 1 day
-				'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+				'Cache-Control': 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400',
 			},
 		});
 	} catch {
-		return new NextResponse('Proxy error', { status: 500 });
+		return new NextResponse('Proxy error', { status: 500, headers: { 'Cache-Control': 'no-store' } });
 	}
 }
