@@ -5,16 +5,20 @@
 	margin-inline: auto;
 	padding-block: var(--space-m);
 }
+
 @keyframes float3d {
 	0% {
 		transform: rotateY(0deg) rotateX(0deg);
 	}
+
 	20% {
 		transform: rotateY(-6deg) rotateX(3deg);
 	}
+
 	60% {
 		transform: rotateY(6deg) rotateX(-3deg);
 	}
+
 	100% {
 		transform: rotateY(0deg) rotateX(0deg);
 	}
@@ -27,6 +31,7 @@
 	justify-content: space-between;
 	align-items: center;
 	perspective: 600px;
+
 	& img {
 		inline-size: var(--space-3xl);
 		block-size: auto;
@@ -40,6 +45,7 @@
 	font-size: var(--step-4);
 	letter-spacing: -0.02em;
 }
+
 .subHeading {
 	font-size: var(--step-1);
 	font-weight: 300;
@@ -64,14 +70,17 @@
 	transition:
 		border-color 0.2s ease,
 		background 0.2s ease;
+
 	&:hover {
 		border-color: var(--border-hover);
 		background: var(--bg-card-hover);
 	}
-	@media (width <= 800px) {
+
+	@media (width <=800px) {
 		height: calc(var(--space-3xl) * 2.5);
 	}
-	@media (width <= 560px) {
+
+	@media (width <=560px) {
 		height: 100%;
 	}
 }
@@ -85,10 +94,12 @@
 .cardLink:has(.cardImage) {
 	grid-template-columns: calc(var(--space-3xl) * 3) 1fr;
 	transition: grid-template-columns 0.4s ease;
-	@media (width <= 720px) {
+
+	@media (width <=720px) {
 		grid-template-columns: calc(var(--space-3xl) * 2.5) 1fr;
 	}
-	@media (width <= 560px) {
+
+	@media (width <=560px) {
 		grid-template-columns: 1fr;
 	}
 }
@@ -96,6 +107,7 @@
 .cardImage {
 	overflow: hidden;
 	background: var(--border);
+
 	& img {
 		inline-size: 100%;
 		block-size: 100%;
@@ -114,6 +126,7 @@
 	position: relative;
 	inline-size: 100%;
 	block-size: 100%;
+
 	& img {
 		inline-size: 100%;
 		block-size: 100%;
@@ -145,12 +158,15 @@
 	z-index: 1;
 	padding: 0;
 }
+
 .galleryArrow:hover {
 	background: rgba(0, 0, 0, 0.7);
 }
+
 .galleryArrowPrev {
 	inset-inline-start: 0.4rem;
 }
+
 .galleryArrowNext {
 	inset-inline-end: 0.4rem;
 }
@@ -179,6 +195,7 @@
 	transition:
 		background 0.2s ease,
 		transform 0.2s ease;
+
 	&:hover {
 		transform: scale(1.25);
 	}
@@ -259,6 +276,7 @@
 	block-size: 100%;
 	object-fit: cover;
 }
+
 .articleHeader {
 	display: flex;
 	flex-direction: column;
@@ -267,6 +285,7 @@
 	padding-block-end: var(--space-m);
 	border-block-end: 1px solid var(--border);
 }
+
 .postHeading {
 	font-family: var(--font-heading);
 	font-size: var(--step-4);
@@ -357,9 +376,12 @@
 
 .content :global(img) {
 	width: 100%;
-	border-radius: var(--space-xs);
-	border: 1px solid var(--border);
 	margin: 1.5rem 0;
+	border-width: var(--space-m);
+	border-style: solid;
+	border-image: url("/frame.png");
+	border-image-slice: 100;
+	border-image-repeat: round;
 }
 
 .content :global(blockquote) {
